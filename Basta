@@ -1,0 +1,67 @@
+-- Crear la Interfaz Base
+local gui = Instance.new("ScreenGui")
+gui.Name = "MenuSimple"
+gui.Parent = game:GetService("CoreGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 150)
+frame.Position = UDim2.new(0.5, -100, 0.5, -75)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 2
+frame.Active = true
+frame.Draggable = true -- Para que puedas moverlo en el celular
+frame.Parent = gui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Text = "LISANDRO HUB"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+title.Parent = frame
+
+-- BOTÓN VELOCIDAD
+local btnSpeed = Instance.new("TextButton")
+btnSpeed.Size = UDim2.new(0.9, 0, 0, 40)
+btnSpeed.Position = UDim2.new(0.05, 0, 0.3, 0)
+btnSpeed.Text = "Velocidad: 120"
+btnSpeed.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+btnSpeed.TextColor3 = Color3.new(1, 1, 1)
+btnSpeed.Parent = frame
+
+btnSpeed.MouseButton1Click:Connect(function()
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 120
+end)
+
+-- BOTÓN NOCLIP
+local btnNoclip = Instance.new("TextButton")
+btnNoclip.Size = UDim2.new(0.9, 0, 0, 40)
+btnNoclip.Position = UDim2.new(0.05, 0, 0.65, 0)
+btnNoclip.Text = "Noclip: OFF"
+btnNoclip.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+btnNoclip.TextColor3 = Color3.new(1, 1, 1)
+btnNoclip.Parent = frame
+
+local noclip = false
+btnNoclip.MouseButton1Click:Connect(function()
+    noclip = not noclip
+    if noclip then
+        btnNoclip.Text = "Noclip: ON"
+        btnNoclip.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+    else
+        btnNoclip.Text = "Noclip: OFF"
+        btnNoclip.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+    end
+end)
+
+-- Bucle de Noclip
+game:GetService("RunService").Stepped:Connect(function()
+    if noclip then
+        if game.Players.LocalPlayer.Character then
+            for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+    end
+end)
