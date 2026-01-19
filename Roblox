@@ -1,0 +1,124 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "No Robar Los Bebes Brainrots Script",
+   LoadingTitle = "Cargando...",
+   LoadingSubtitle = "Sistema de Posición Manual",
+   ConfigurationSaving = { Enabled = false }
+})
+
+local Tab = Window:CreateTab("Script", 4483362458)
+
+local player = game.Players.LocalPlayer
+-- Guardamos la posición inicial apenas se ejecuta el script
+local spawnManual = nil
+
+local function setSpawn()
+    local char = player.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        spawnManual = char.HumanoidRootPart.CFrame
+        Rayfield:Notify({Title = "Base Guardada", Content = "Esta posición ahora es tu base.", Duration = 3})
+    end
+end
+
+-- Intentar capturar la posición inicial automáticamente
+task.spawn(function()
+    task.wait(1)
+    setSpawn()
+end)
+
+-- 1. BOTÓN: MARCAR MI BASE (Por si el auto-registro falla)
+Tab:CreateButton({
+   Name = "Marcar esta posición como mi Base/Spawn",
+   Callback = function()
+       setSpawn()
+   end,
+})
+
+---
+
+-- 2. BOTÓN: ROBO INSTANTÁNEO
+Tab:CreateButton({
+   Name = "Robo instantáneo",
+   Callback = function()
+       local char = player.Character
+       local hrp = char:FindFirstChild("HumanoidRootPart")
+       
+       if hrp and spawnManual then
+           local posOriginal = hrp.CFrame
+           hrp.CFrame = spawnManual
+           task.wait(0.8) -- Tiempo para entregar
+           hrp.CFrame = posOriginal
+       else
+           Rayfield:Notify({Title = "Error", Content = "Primero marca tu base con el botón de arriba.", Duration = 3})
+       end
+   end,
+})
+
+-- 3. BOTÓN: TELETRANSPORTARTE A TU BASE
+Tab:CreateButton({
+   Name = "Teletransportarte a tu base",
+   Callback = function()
+       local char = player.Character
+       local hrp = char:FindFirstChild("HumanoidRootPart")
+       
+       if hrp and spawnManual then
+           hrp.CFrame = spawnManual
+       end
+   end,
+})
+
+-- 4. BOTÓN: AUTO STEAL
+Tab:CreateButton({
+   Name = "Auto Steal (Bebé más cercano)",
+   Callback = function()
+       local char = player.Character
+       local hrp = char:FindFirstChild("HumanoidRootPart")
+       if hrp then
+           local objetivo = nil
+           local distanciaMinima = math.huge
+           for _, v in pairs(workspace:GetDescendants()) do
+               if (v.Name:lower():find("baby") or v.Name:lower():find("bebe")) then
+                   local part = v:FindFirstChild("HumanoidRootPart") or v:FindFirstChildWhichIsA("BasePart")
+                   if part then
+                       local dist = (hrp.Position - part.Position).Magnitude
+                       if dist < distanciaMinima and dist > 10 then
+                           distanciaMinima = dist
+                           objetivo = part
+                       end
+                   end
+               end
+           end
+           if objetivo then hrp.CFrame = objetivo.CFrame * CFrame.new(0, 3, 0) end
+       end
+   end,
+})
+
+-- 5. BOTÓN: INVISIBLE
+Tab:CreateButton({
+   Name = "Invisible/no detectable",
+   Callback = function()
+       if player.Character then
+           for _, v in pairs(player.Character:GetDescendants()) do
+               if v:IsA("BasePart") or v:IsA("Decal") then v.Transparency = 1 end
+           end
+       end
+   end,
+})
+
+-- 6. BOTÓN: NOCLIP
+local noclipActivo = false
+Tab:CreateToggle({
+   Name = "Noclip",
+   CurrentValue = false,
+   Callback = function(valor)
+       noclipActivo = valor
+       game:GetService("RunService").Stepped:Connect(function()
+           if noclipActivo and player.Character then
+               for _, p in pairs(player.Character:GetDescendants()) do
+                   if p:IsA("BasePart") then p.CanCollide = false end
+               end
+           end
+       end)
+   end,
+})
