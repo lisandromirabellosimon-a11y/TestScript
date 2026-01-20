@@ -1,0 +1,60 @@
+-- Crear la Interfaz (GUI)
+local screenGui = Instance.new("ScreenGui")
+local frame = Instance.new("Frame")
+local fixBaseBtn = Instance.new("TextButton")
+local teleportBtn = Instance.new("TextButton")
+
+-- Configuración del Menú
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+screenGui.ResetOnSpawn = false
+
+frame.Parent = screenGui
+frame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+frame.Position = UDim2.new(0.05, 0, 0.4, 0)
+frame.Size = UDim2.new(0, 150, 0, 110)
+frame.Active = true
+frame.Draggable = true -- Para que puedas mover el menú con el mouse
+
+-- Botón: Fijar Base
+fixBaseBtn.Parent = frame
+fixBaseBtn.Text = "Fijar Base"
+fixBaseBtn.Size = UDim2.new(0, 130, 0, 40)
+fixBaseBtn.Position = UDim2.new(0, 10, 0, 10)
+fixBaseBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+fixBaseBtn.TextColor3 = Color3.new(1, 1, 1)
+
+-- Botón: Teleport To Base
+teleportBtn.Parent = frame
+teleportBtn.Text = "Teleport To Base"
+teleportBtn.Size = UDim2.new(0, 130, 0, 40)
+teleportBtn.Position = UDim2.new(0, 10, 0, 60)
+teleportBtn.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+teleportBtn.TextColor3 = Color3.new(1, 1, 1)
+
+--- Lógica del Script ---
+
+local savedPosition = nil
+local player = game.Players.LocalPlayer
+
+-- Guardar posición
+fixBaseBtn.MouseButton1Click:Connect(function()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        savedPosition = player.Character.HumanoidRootPart.CFrame
+        fixBaseBtn.Text = "¡Base Guardada!"
+        wait(1)
+        fixBaseBtn.Text = "Fijar Base"
+    end
+end)
+
+-- Teletransportar
+teleportBtn.MouseButton1Click:Connect(function()
+    if savedPosition then
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            player.Character.HumanoidRootPart.CFrame = savedPosition
+        end
+    else
+        teleportBtn.Text = "No hay base fija"
+        wait(1)
+        teleportBtn.Text = "Teleport To Base"
+    end
+end)
