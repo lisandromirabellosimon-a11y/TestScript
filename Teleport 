@@ -1,0 +1,60 @@
+local TweenService = game:GetService("TweenService")
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+local frame = Instance.new("Frame")
+local fixBaseBtn = Instance.new("TextButton")
+local teleportBtn = Instance.new("TextButton")
+
+-- Configuración visual
+screenGui.Parent = player:WaitForChild("PlayerGui")
+screenGui.ResetOnSpawn = false
+frame.Parent = screenGui
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.Position = UDim2.new(0.05, 0, 0.4, 0)
+frame.Size = UDim2.new(0, 160, 0, 120)
+frame.Active = true
+frame.Draggable = true
+
+fixBaseBtn.Parent = frame
+fixBaseBtn.Text = "Fijar Base"
+fixBaseBtn.Size = UDim2.new(0, 140, 0, 45)
+fixBaseBtn.Position = UDim2.new(0, 10, 0, 10)
+fixBaseBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+fixBaseBtn.TextColor3 = Color3.new(1, 1, 1)
+
+teleportBtn.Parent = frame
+teleportBtn.Text = "Teleport To Base"
+teleportBtn.Size = UDim2.new(0, 140, 0, 45)
+teleportBtn.Position = UDim2.new(0, 10, 0, 65)
+teleportBtn.BackgroundColor3 = Color3.fromRGB(255, 85, 0)
+teleportBtn.TextColor3 = Color3.new(1, 1, 1)
+
+local savedPosition = nil
+
+-- Guardar posición
+fixBaseBtn.MouseButton1Click:Connect(function()
+    local char = player.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        savedPosition = char.HumanoidRootPart.CFrame
+        fixBaseBtn.Text = "¡Base Guardada!"
+        wait(1)
+        fixBaseBtn.Text = "Fijar Base"
+    end
+end)
+
+-- Teletransporte Suave (Anti-Reinicio)
+teleportBtn.MouseButton1Click:Connect(function()
+    local char = player.Character
+    if savedPosition and char and char:FindFirstChild("HumanoidRootPart") then
+        local hrp = char.HumanoidRootPart
+        -- Creamos una animación de movimiento muy rápida (0.1 segundos)
+        local info = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
+        local tween = TweenService:Create(hrp, info, {CFrame = savedPosition})
+        
+        tween:Play()
+    else
+        teleportBtn.Text = "Error: Sin Base"
+        wait(1)
+        teleportBtn.Text = "Teleport To Base"
+    end
+end)
