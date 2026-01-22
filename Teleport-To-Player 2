@@ -1,0 +1,59 @@
+-- Configuración de la Interfaz
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local UserInput = Instance.new("TextBox")
+local TeleportBtn = Instance.new("TextButton")
+
+ScreenGui.Parent = game:GetService("CoreGui")
+MainFrame.Name = "TeleportPanel"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Position = UDim2.new(0.5, -100, 0.5, -75)
+MainFrame.Size = UDim2.new(0, 200, 0, 150)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+Title.Parent = MainFrame
+Title.Text = "Teleport To Player"
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Font = Enum.Font.SourceSansBold
+
+UserInput.Parent = MainFrame
+UserInput.PlaceholderText = "Usuario Del Jugador"
+UserInput.Text = ""
+UserInput.Position = UDim2.new(0.1, 0, 0.35, 0)
+UserInput.Size = UDim2.new(0.8, 0, 0, 30)
+
+TeleportBtn.Parent = MainFrame
+TeleportBtn.Text = "Ir al Jugador"
+TeleportBtn.Position = UDim2.new(0.1, 0, 0.7, 0)
+TeleportBtn.Size = UDim2.new(0.8, 0, 0, 30)
+TeleportBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+TeleportBtn.TextColor3 = Color3.new(1, 1, 1)
+
+-- Lógica para que sea visible y efectivo
+TeleportBtn.MouseButton1Click:Connect(function()
+    local targetName = UserInput.Text:lower()
+    local players = game:GetService("Players")
+    local localPlayer = players.LocalPlayer
+    
+    for _, v in pairs(players:GetPlayers()) do
+        if v.Name:lower():sub(1, #targetName) == targetName or v.DisplayName:lower():sub(1, #targetName) == targetName then
+            if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                local myChar = localPlayer.Character
+                local targetRoot = v.Character.HumanoidRootPart
+                
+                if myChar and myChar:FindFirstChild("HumanoidRootPart") then
+                    -- Aparecer 3 studs adelante del jugador para que te vea de frente
+                    -- El CFrame.lookAt hace que lo mires directamente al llegar
+                    local offset = targetRoot.CFrame.LookVector * 3
+                    myChar.HumanoidRootPart.CFrame = CFrame.new(targetRoot.Position + offset, targetRoot.Position)
+                end
+                break
+            end
+        end
+    end
+end)
